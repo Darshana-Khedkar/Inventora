@@ -17,6 +17,14 @@ app.use(cors());
 app.use(helmet());
 app.use(morgan('dev'));
 
+const userRoutes = require('./routes/userRoutes');
+app.use('/api/users', userRoutes);
+
+const productRoutes = require('./routes/productRoutes');
+app.use('/api/products', productRoutes);
+
+
+
 // Basic Route
 app.get('/', (req, res) => {
   res.send('Inventora API is running...');
