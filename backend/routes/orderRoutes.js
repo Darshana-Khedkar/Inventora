@@ -6,16 +6,17 @@ const {
   getUserOrders,
   updateOrderStatus,
 } = require('../controllers/orderController');
-const { protect, isAdmin } = require('../middleware/authMiddleware');
 
-const { exportOrdersCSV } = require('../controllers/orderController');
-router.get('/export/csv', protect, isAdmin, exportOrdersCSV);
+// User places order
+router.post('/', createOrder);
 
+// Admin - get all orders
+router.get('/', getAllOrders);
 
-// Protected Routes
-router.post('/', protect, createOrder);
-router.get('/', protect, isAdmin, getAllOrders);
-router.get('/user/:userId', protect, getUserOrders);
-router.put('/:id/status', protect, isAdmin, updateOrderStatus);
+// User - view own orders
+router.get('/user/:userId', getUserOrders);
+
+// Admin - update status
+router.put('/:id/status', updateOrderStatus);
 
 module.exports = router;
