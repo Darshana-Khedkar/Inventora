@@ -8,7 +8,6 @@ router.post('/login', loginUser);
 
 module.exports = router;
 
-//chatgpt given us for admin access and recommend to comment it out.
 
 // const User = require('../models/User');
 // 

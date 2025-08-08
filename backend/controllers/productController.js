@@ -11,12 +11,37 @@ exports.createProduct = async (req, res) => {
 };
 
 // @desc    Get all products
+//exports.getProducts = async (req, res) => {
+//  try {
+//    const products = await Product.find();
+//    res.json(products);
+//  } catch (err) {
+//    res.status(500).json({ message: err.message });
+//  }
+//};
+
 exports.getProducts = async (req, res) => {
   try {
-    const products = await Product.find();
-    res.json(products);
+    const page = Number(req.query.page) || 1;
+    const limit = 5; // products per page
+    const search = req.query.search || '';
+
+    const query = search
+      ? { name: { $regex: search, $options: 'i' } }
+      : {};
+
+    const total = await Product.countDocuments(query);
+    const products = await Product.find(query)
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.json({
+      products,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Server Error' });
   }
 };
 
