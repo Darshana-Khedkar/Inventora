@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
+const { Parser } = require('json2csv');
 
 exports.getAdminStats = async (req, res) => {
   try {
@@ -21,3 +22,38 @@ exports.getAdminStats = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+
+// @desc Export all orders as CSV
+exports.exportOrdersCSV = async (req, res) => {
+  try {
+    const orders = await Order.find()
+      .populate('userId', 'name email')
+      .populate('products.productId', 'name price');
+
+    const flatData = orders.map((order) => ({
+  OrderID: order._id,
+  Customer: order.userId?.name || 'N/A',
+  Email: order.userId?.email || 'N/A',
+  Status: order.status,
+  TotalAmount: order.totalAmount,
+  CreatedAt: order.createdAt.toISOString(),
+  Products: order.products
+    .map((p) =>
+      p.productId ? `${p.productId.name} (x${p.quantity})` : `Unknown Product`
+    )
+    .join(', '),
+}));
+
+
+    const parser = new Parser();
+    const csv = parser.parse(flatData);
+
+    res.header('Content-Type', 'text/csv');
+    res.attachment('orders.csv');
+    return res.send(csv);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+

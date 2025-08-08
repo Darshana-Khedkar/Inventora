@@ -1,11 +1,11 @@
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 
-// @desc Create a new order
+const sendEmail = require('../utils/mailer');
+
 exports.createOrder = async (req, res) => {
   try {
-    const { products } = req.body;
-    const userId = req.body.userId; // or use req.user._id if authenticated
+    const { products, userId } = req.body;
 
     let total = 0;
 
@@ -21,11 +21,58 @@ exports.createOrder = async (req, res) => {
       totalAmount: total,
     });
 
+    // 🔔 Send email to admin
+    // const user = await User.findById(userId);
+    const user = { name: 'Admin', email: process.env.EMAIL_USER }; // Mock user for admin email
+    const orderDetails = products.map(
+      (p) => `- ${p.productId} x${p.quantity}`
+    ).join('\n');
+
+    const emailBody = `
+New order placed by ${user.name} (${user.email}):
+
+Order ID: ${order._id}
+Total: ₹${order.totalAmount}
+Items:
+${orderDetails}
+`;
+
+    //await sendEmail(process.env.EMAIL_USER, 'New Order Placed - Inventora', emailBody);
+    console.log('New Order Placed - Inventora', emailBody);
+
     res.status(201).json(order);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
+
+
+// // @desc Create a new order
+// exports.createOrder = async (req, res) => {
+//   try {
+//     const { products } = req.body;
+//     const userId = req.body.userId; // or use req.user._id if authenticated
+
+//     let total = 0;
+
+//     for (const item of products) {
+//       const product = await Product.findById(item.productId);
+//       if (!product) return res.status(404).json({ message: 'Product not found' });
+//       total += product.price * item.quantity;
+//     }
+
+//     const order = await Order.create({
+//       userId,
+//       products,
+//       totalAmount: total,
+//     });
+
+//     res.status(201).json(order);
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };
 
 // @desc Get all orders (Admin)
 exports.getAllOrders = async (req, res) => {
