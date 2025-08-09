@@ -9,9 +9,9 @@ import AdminProductList from './pages/AdminProductList';
 import EditProduct from './pages/EditProduct';
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
-import MyOrdersPage from "./pages/MyOrdersPage";
 import Navbar from "./components/Navbar";
-
+import MyOrders from "./pages/MyOrders";
+import AdminOrders from "./pages/AdminOrders";
 
 function App() {
   return (
@@ -33,7 +33,8 @@ function App() {
 
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/my-orders" element={<MyOrdersPage />} />
+        <Route path="/my-orders" element={<MyOrders />} />
+        <Route path="/admin/orders" element={<AdminOrders />} />
 
       </Routes>
     </Router>

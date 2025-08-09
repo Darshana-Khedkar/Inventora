@@ -20,16 +20,37 @@ const ProductList = () => {
     dispatch(getProducts({ page: pageNumber, search }));
   };
 
+//  const handleAddToCart = (product) => {
+//    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+//    cart.push({ ...product, quantity: 1 });
+//    localStorage.setItem("cart", JSON.stringify(cart));
+//
+//    // Trigger event for navbar
+//    window.dispatchEvent(new Event("cartUpdated"));
+//
+//    toast.success(`${product.name} added to cart!`, { position: "top-right" });
+//  };
   const handleAddToCart = (product) => {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    cart.push({ ...product, quantity: 1 });
+    const existing = cart.find((item) => item.productId === product._id);
+
+    if (existing) {
+      existing.quantity += 1;
+    } else {
+      cart.push({
+        productId: product._id, // ✅ include productId
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+        image: product.image
+      });
+    }
+
     localStorage.setItem("cart", JSON.stringify(cart));
-
-    // Trigger event for navbar
     window.dispatchEvent(new Event("cartUpdated"));
-
     toast.success(`${product.name} added to cart!`, { position: "top-right" });
   };
+
 
   return (
     <div className="p-6 max-w-6xl mx-auto">

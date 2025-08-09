@@ -14,6 +14,15 @@ const CartPage = () => {
     setCartItems(cart);
   }, []);
 
+//  const updateQuantity = (id, qty) => {
+//    const updated = cartItems.map((item) =>
+//      item.productId === id ? { ...item, quantity: qty } : item
+//    );
+//    setCartItems(updated);
+//    localStorage.setItem("cart", JSON.stringify(updated));
+//    window.dispatchEvent(new Event("cartUpdated"));
+//  };
+
   const updateQuantity = (id, qty) => {
     const updated = cartItems.map((item) =>
       item.productId === id ? { ...item, quantity: qty } : item
@@ -22,6 +31,13 @@ const CartPage = () => {
     localStorage.setItem("cart", JSON.stringify(updated));
     window.dispatchEvent(new Event("cartUpdated"));
   };
+
+//  const removeItem = (id) => {
+//    const updated = cartItems.filter((item) => item.productId !== id);
+//    setCartItems(updated);
+//    localStorage.setItem("cart", JSON.stringify(updated));
+//    window.dispatchEvent(new Event("cartUpdated"));
+//  };
 
   const removeItem = (id) => {
     const updated = cartItems.filter((item) => item.productId !== id);
@@ -43,15 +59,25 @@ const CartPage = () => {
     }
 
     try {
+//      const payload = {
+//        userId: userInfo._id,
+//        products: cartItems.map((item) => ({
+//          productId: item.productId,
+//          quantity: item.quantity,
+//        })),
+//      };
+//
+//      await axiosInstance.post("/orders", payload);
+
       const payload = {
         userId: userInfo._id,
         products: cartItems.map((item) => ({
-          productId: item.productId,
-          quantity: item.quantity,
-        })),
+          productId: item.productId, // ✅ now this will exist
+          quantity: item.quantity
+        }))
       };
-
       await axiosInstance.post("/orders", payload);
+
 
       toast.success("Order placed successfully!");
       localStorage.removeItem("cart");

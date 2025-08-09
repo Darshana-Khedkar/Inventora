@@ -6,6 +6,9 @@ const {
   getUserOrders,
   updateOrderStatus,
 } = require('../controllers/orderController');
+const { exportOrdersCSV } = require("../controllers/orderController");
+
+router.get("/export/csv", exportOrdersCSV);
 
 // User places order
 router.post('/', createOrder);
