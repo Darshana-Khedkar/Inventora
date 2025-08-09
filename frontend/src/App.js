@@ -7,11 +7,17 @@ import ProductList from './pages/ProductList';
 import AddProduct from './pages/AddProduct';
 import AdminProductList from './pages/AdminProductList';
 import EditProduct from './pages/EditProduct';
+import CartPage from "./pages/CartPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import MyOrdersPage from "./pages/MyOrdersPage";
+import Navbar from "./components/Navbar";
+
 
 function App() {
   return (
     <Router>
       <ToastContainer />
+      <Navbar />
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
@@ -24,6 +30,11 @@ function App() {
         <Route path="/admin/products/add" element={<AddProduct />} />
 
         <Route path="/admin/products/:id/edit" element={<EditProduct />} />
+
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/my-orders" element={<MyOrdersPage />} />
+
       </Routes>
     </Router>
   );

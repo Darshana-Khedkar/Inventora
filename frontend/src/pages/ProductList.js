@@ -1,34 +1,42 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { getProducts, deleteProduct } from '../redux/slices/productSlice';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getProducts } from "../redux/slices/productSlice";
+import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const ProductList = () => {
   const dispatch = useDispatch();
-  const { products, loading, error, totalPages, currentPage } = useSelector((state) => state.products);
+  const { products, loading, error, totalPages, currentPage } = useSelector(
+    (state) => state.products
+  );
   const { userInfo } = useSelector((state) => state.auth);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    dispatch(getProducts({ page: 1 })); // Load first page when component mounts
-  }, [dispatch]);
-
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      dispatch(deleteProduct(id)).then(() => {
-        dispatch(getProducts({ page: currentPage })); // Reload current page after delete
-      });
-    }
-  };
+    dispatch(getProducts({ page: 1, search }));
+  }, [dispatch, search]);
 
   const handlePageChange = (pageNumber) => {
-    dispatch(getProducts({ page: pageNumber }));
+    dispatch(getProducts({ page: pageNumber, search }));
+  };
+
+  const handleAddToCart = (product) => {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    cart.push({ ...product, quantity: 1 });
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    // Trigger event for navbar
+    window.dispatchEvent(new Event("cartUpdated"));
+
+    toast.success(`${product.name} added to cart!`, { position: "top-right" });
   };
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
+      {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Products</h1>
-        {userInfo?.role === 'admin' && (
+        {userInfo?.role === "admin" && (
           <Link
             to="/admin/products/add"
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
@@ -36,6 +44,17 @@ const ProductList = () => {
             ➕ Add Product
           </Link>
         )}
+      </div>
+
+      {/* Search bar */}
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search products..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="border p-2 rounded w-full"
+        />
       </div>
 
       {loading && <p>Loading products...</p>}
@@ -48,7 +67,7 @@ const ProductList = () => {
             className="border rounded-lg p-4 shadow hover:shadow-lg transition"
           >
             <img
-              src={product.image || 'https://via.placeholder.com/150'}
+              src={product.image || "https://via.placeholder.com/150"}
               alt={product.name}
               className="w-full h-40 object-cover rounded mb-4"
             />
@@ -56,7 +75,7 @@ const ProductList = () => {
             <p className="text-gray-600">₹{product.price}</p>
 
             <div className="mt-4 flex gap-2">
-              {userInfo?.role === 'admin' ? (
+              {userInfo?.role === "admin" ? (
                 <>
                   <Link
                     to={`/admin/products/edit/${product._id}`}
@@ -64,15 +83,12 @@ const ProductList = () => {
                   >
                     Edit
                   </Link>
-                  <button
-                    onClick={() => handleDelete(product._id)}
-                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
                 </>
               ) : (
-                <button className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+                <button
+                  onClick={() => handleAddToCart(product)}
+                  className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                >
                   Add to Cart
                 </button>
               )}
@@ -89,7 +105,9 @@ const ProductList = () => {
               key={index + 1}
               onClick={() => handlePageChange(index + 1)}
               className={`px-3 py-1 border rounded ${
-                currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-white text-gray-700'
+                currentPage === index + 1
+                  ? "bg-blue-500 text-white"
+                  : "bg-white text-gray-700"
               }`}
             >
               {index + 1}
