@@ -7,14 +7,16 @@ const {
   updateProduct,
   deleteProduct,
 } = require('../controllers/productController');
+const { protect, isAdmin } = require('../middleware/authMiddleware');
+
 
 // Public (for customer browsing)
 router.get('/', getProducts);
 router.get('/:id', getProductById);
 
-// Admin only (in future: add auth + role check middleware)
-router.post('/', createProduct);
-router.put('/:id', updateProduct);
-router.delete('/:id', deleteProduct);
+// Admin only
+router.post('/', protect, isAdmin, createProduct);
+router.put('/:id', protect, isAdmin, updateProduct);
+router.delete('/:id', protect, isAdmin, deleteProduct);
 
 module.exports = router;
